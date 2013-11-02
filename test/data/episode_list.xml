@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+
+<Show>
+<name>Modern Family</name>
+<totalseasons>5</totalseasons>
+<Episodelist>
+
+<Season no="1">
+<episode><epnum>1</epnum><seasonnum>01</seasonnum><prodnum>1ARG79</prodnum><airdate>2009-09-23</airdate><link>http://www.tvrage.com/Modern_Family/episodes/1064810238</link><title>Pilot</title></episode>
+<episode><epnum>2</epnum><seasonnum>02</seasonnum><prodnum>1ARG02</prodnum><airdate>2009-09-30</airdate><link>http://www.tvrage.com/Modern_Family/episodes/1064837883</link><title>The Bicycle Thief</title></episode>
+</Season>
+
+<Season no="2">
+<episode><epnum>25</epnum><seasonnum>01</seasonnum><prodnum>2ARG05</prodnum><airdate>2010-09-22</airdate><link>http://www.tvrage.com/Modern_Family/episodes/1064957278</link><title>The Old Wagon</title></episode>
+<episode><epnum>26</epnum><seasonnum>02</seasonnum><prodnum>2ARG04</prodnum><airdate>2010-09-29</airdate><link>http://www.tvrage.com/Modern_Family/episodes/1064975829</link><title>The Kiss</title></episode>
+</Season>
+
+
+</Episodelist>
+
+</Show>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Results>
+<show>
+<showid>22622</showid>
+<name>Modern Family</name>
+<link>http://www.tvrage.com/Modern_Family</link>
+<country>US</country>
+<started>2009</started>
+<ended>0</ended>
+<seasons>5</seasons>
+<status>Returning Series</status>
+<classification>Scripted</classification>
+<genres><genre>Comedy</genre></genres>
+</show>
+<show>
+<showid>1</showid>
+<name>some other show</name>
+<link>http://www.tvrage.com/some_other_show</link>
+<country>US</country>
+<started>1995</started>
+<ended>1996</ended>
+<seasons>1</seasons>
+<status>Returning Series</status>
+<classification>Documentary</classification>
+<genres><genre>genre1</genre><genre>genre2</genre></genres>
+</show>
+</Results>
