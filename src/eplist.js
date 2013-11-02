@@ -1,17 +1,22 @@
 module.exports = {
-    parse: function(xml, callback) {
-        process.nextTick(function() {
-            if (!(xml && xml.Show && xml.Show.Episodelist && xml.Show.Episodelist[0])) {
-                callback({
-                    error: "malformed xml",
-                    detail: "expected xml.Show.Episodelist[0], got: " + JSON.stringify(xml)
+    parse: parse
+};
+
+var xph = require("./xmlparsehelper");
+
+function parse(rawXmlString, callback) {
+    process.nextTick(function() {
+        xph.parseToNode(rawXmlString, "Show.Episodelist.0.Season", function(err, node) {
+            if (err) {
+                process.nextTick(function() {
+                    callback(err);
                 });
             } else {
-                mapEps(xml.Show.Episodelist[0].Season, callback);
+                mapEps(node, callback);
             }
         });
-    }
-};
+    });
+}
 
 function mapEps(seasons, callback) {
     try {
@@ -38,13 +43,10 @@ function mapSeason(season) {
 }
 
 function mapEpisode(episode) {
-    return {
-        index: {
-            overall: episode.epnum[0],
-            season: episode.seasonnum[0],
-        },
-        aired: episode.airdate[0],
-        link: episode.link[0],
-        title: episode.title[0]
-    };
+    var result = xph.mapSimpleFields(episode, [
+        {from: "airdate", to: "aired"}, "link", "title"]);
+    result.index = xph.mapSimpleFields(episode, [
+        {from: "epnum", to: "overall"},
+        {from: "seasonnum", to: "season"}]);
+    return result;
 }
