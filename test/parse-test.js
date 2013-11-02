@@ -2,17 +2,58 @@ var vows = require("vows"),
     fs = require("fs"),
     assert = require("assert"),
     xml2js = require("xml2js"),
+    xph = require("../src/xmlparsehelper"),
     search = require("../src/search"),
     eplist = require("../src/eplist");
 
 function getTestXml(name, callback) {
     var xml = fs.readFileSync("./test/data/" + name + ".xml", {encoding: "utf-8"});
-    xml2js.parseString(xml, function(err, data) {
-        callback(err, data);
-    });
+    xml2js.parseString(xml, callback);
 }
 
 vows.describe("parsing").addBatch({
+    "given raw xml": {
+        topic: function() {
+            return "<a><b>value</b></a>";
+        },
+        "when it is parsed, searching for root *a*": {
+            topic: function(xml) {
+                return xph.parseToNode(xml, "a", this.callback);
+            },
+            "no error occured": function(err, results) {
+                assert.isNull(err);
+            },
+            "the result is an object": function(err, obj) {
+                assert.isObject(obj);
+            },
+            "the result has field *b* == 'value'": function(err, obj) {
+                assert.equal(obj.b[0], "value");
+            },
+            "the result can be mapped to an object": {
+                topic: function(xmlObj) {
+                    return xph.mapSimpleFields(xmlObj, ["b"]);
+                },
+                "which returns an object": function(mappedObj) {
+                    assert.isObject(mappedObj);
+                },
+                "with a string field *b* with value *value*": function(mappedObj) {
+                    assert.equal(typeof(mappedObj.b), "string");
+                    assert.equal(mappedObj.b, "value");
+                }
+            }
+        },
+        "when it is parsed, searching for root *a.root*": {
+            topic: function(xml) {
+                return xph.parseToNode(xml, "a.root", this.callback);
+            },
+            "an error occurs": function(err, results) {
+                assert.isNotNull(err);
+                assert.isUndefined(results);
+                assert.equal(err.error, "root not found");
+                assert.equal(err.detailed, "expected 'root' in {\"b\":[\"value\"]}");
+            }
+        }
+    },
     "with search results": {
         topic: function() { getTestXml("search", this.callback) },
         "when the xml is parsed": {
