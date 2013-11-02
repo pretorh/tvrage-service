@@ -1,0 +1,28 @@
+{
+  "name": "tvrage-service",
+  "version": "0.0.0",
+  "description": "node tvrage api wrapper module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/all"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pretorh/tvrage-service.git"
+  },
+  "keywords": [
+    "tvrage",
+    "episode",
+    "series",
+    "tv",
+    "service"
+  ],
+  "author": "Hendri Pretorius",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pretorh/tvrage-service/issues"
+  },
+  "devDependencies": {
+    "vows": "~0.7.0"
+  }
+}
