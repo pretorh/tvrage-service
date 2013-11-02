@@ -4,12 +4,8 @@ var vows = require("vows"),
     xml2js = require("xml2js"),
     xph = require("../src/xmlparsehelper"),
     search = require("../src/search"),
-    eplist = require("../src/eplist");
-
-function getTestXml(name, callback) {
-    var xml = fs.readFileSync("./test/data/" + name + ".xml", {encoding: "utf-8"});
-    xml2js.parseString(xml, callback);
-}
+    eplist = require("../src/eplist"),
+    seriesinfo = require("../src/seriesinfo");
 
 vows.describe("parsing").addBatch({
     "given raw xml": {
@@ -151,9 +147,38 @@ vows.describe("parsing").addBatch({
             }
         }
     },
-    "series info results": {
-        topic: fs.readFileSync("./test/data/episodeinfo.xml", {encoding: "utf-8"}),
-        "not yet implemented": function() {
+    "with the series info results": {
+        topic: function() {
+            var xml = fs.readFileSync("./test/data/episodeinfo.xml", {encoding: "utf-8"});
+            seriesinfo.parse(xml, this.callback);
+        },
+        "no errors occured": function(err, result) {
+            assert.isNull(err);
+            assert.isNotNull(result);
+        },
+        "the result has some basic details": function(err, result) {
+            assert.equal(result.id, 22622);
+            assert.equal(result.name, "Modern Family");
+            assert.equal(result.status, "Returning Series");
+            assert.equal(result.runtime, 30);
+        },
+        "the result has the airtime": function(err, result) {
+            assert.equal(result.airtime.day, 3);
+            assert.equal(result.airtime.dayName, "Wednesday");
+            assert.equal(result.airtime.time, 21 * 60);
+            assert.equal(result.airtime.timeString, "09:00 pm");
+        },
+        "the latest ep is *05x06*": function(err, result) {
+            assert.equal(result.latest.season, 5);
+            assert.equal(result.latest.number, 6);
+            assert.equal(result.latest.title, "The Help");
+            assert.equal(result.latest.aired, "2013-10-23");
+        },
+        "the next ep is *05x07*": function(err, result) {
+            assert.equal(result.next.season, 5);
+            assert.equal(result.next.number, 7);
+            assert.equal(result.next.title, "A Fair to Remember");
+            assert.equal(result.next.aired, "2013-11-13");
         }
     }
 }).export(module);
