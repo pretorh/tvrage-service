@@ -163,22 +163,38 @@ vows.describe("parsing").addBatch({
             assert.equal(result.runtime, 30);
         },
         "the result has the airtime": function(err, result) {
+            assert.isNotNull(result.airtime);
             assert.equal(result.airtime.day, 3);
             assert.equal(result.airtime.dayName, "Wednesday");
             assert.equal(result.airtime.time, 21 * 60);
             assert.equal(result.airtime.timeString, "09:00 pm");
         },
         "the latest ep is *05x06*": function(err, result) {
+            assert.isNotNull(result.latest);
             assert.equal(result.latest.season, 5);
             assert.equal(result.latest.number, 6);
             assert.equal(result.latest.title, "The Help");
             assert.equal(result.latest.aired, "2013-10-23");
         },
         "the next ep is *05x07*": function(err, result) {
+            assert.isNotNull(result.next);
             assert.equal(result.next.season, 5);
             assert.equal(result.next.number, 7);
             assert.equal(result.next.title, "A Fair to Remember");
             assert.equal(result.next.aired, "2013-11-13");
+        }
+    },
+    "with an ended series' info results": {
+        topic: function() {
+            var xml = fs.readFileSync("./test/data/episodeinfo2.xml", {encoding: "utf-8"});
+            seriesinfo.parse(xml, this.callback);
+        },
+        "no errors occured": function(err, result) {
+            assert.isNull(err);
+            assert.isNotNull(result);
+        },
+        "the next ep object is *undefined*": function(err, result) {
+            assert.isUndefined(result.next);
         }
     }
 }).export(module);

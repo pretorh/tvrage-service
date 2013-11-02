@@ -26,7 +26,7 @@ function mapSeriesInfo(info, callback) {
         var more = xph.mapSimpleFields(info, ["airtime", "latestepisode", "nextepisode"] );
         result.airtime = mapAirtime(more.airtime);
         result.latest = mapEpInfo(more.latestepisode);
-        result.next = mapEpInfo(more.nextepisode);
+        result.next = more.nextepisode ? mapEpInfo(more.nextepisode) : undefined;
         
         process.nextTick(function() {
             callback(null, result);

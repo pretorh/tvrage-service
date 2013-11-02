@@ -40,10 +40,11 @@ function findXpath(obj, path, callback) {
 function map(xml, fields) {
     var result = {};
     for (var i = 0; i < fields.length; ++i) {
-        if (fields[i].from && fields[i].to) {
-            result[fields[i].to] = xml[fields[i].from][0];
+        var f = fields[i];
+        if (f.from && f.to) {
+            result[f.to] = xml && xml[f.from] ? xml[f.from][0] : undefined;
         } else {
-            result[fields[i]] = xml[fields[i]][0];
+            result[f] = xml && xml[f] ? xml[f][0] : undefined;
         }
     }
     return result;
