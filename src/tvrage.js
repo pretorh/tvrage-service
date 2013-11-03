@@ -1,5 +1,9 @@
 module.exports = {
     search: function(series, options, callback) {
+        if (typeof(options) === "function" && callback === undefined) {
+            callback = options;
+            options = {};
+        }
         var values = search.queryObject(series);
         makeApiCall(options, search, values, callback);
     },
@@ -29,24 +33,28 @@ function makeApiCall(userOptions, apiCall, values, callback) {
         if (err) {
             callback(err);
         } else {
-            options.get(url, function(err, xml) {
-                if (err) {
-                    process.nextTick(function() {
-                        callback(err);
-                    });
-                } else {
-                    process.nextTick(function() {
-                        apiCall.parse(xml, callback);
-                    });
-                }
-            });
+            if (options.get === serviceClientWrapper) {
+                serviceClientWrapper(apiCall, url, callback);
+            } else {
+                options.get(url, function(err, xml) {
+                    if (err) {
+                        process.nextTick(function() {
+                            callback(err);
+                        });
+                    } else {
+                        process.nextTick(function() {
+                            apiCall.parse(xml, callback);
+                        });
+                    }
+                });
+            }
         }
     });
 }
 
 function buildOptions(user, callback) {
     const DEFAULT = {
-        get: function() {}
+        get: serviceClientWrapper
     };
     
     try {
@@ -58,5 +66,14 @@ function buildOptions(user, callback) {
         process.nextTick(function() {
             callback(e);
         });
+    }
+}
+
+function serviceClientWrapper(apiCall, url, callback) {
+    try {
+        var sc = require("service-client");
+        sc.get(url, { parse: apiCall.parse }, callback);
+    } catch (e) {
+        callback(e);
     }
 }
