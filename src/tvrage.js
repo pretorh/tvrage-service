@@ -1,21 +1,28 @@
 module.exports = {
     search: function(series, options, callback) {
-        if (typeof(options) === "function" && callback === undefined) {
-            callback = options;
-            options = {};
-        }
+        var params = fixParameters(options, callback);
         var values = search.queryObject(series);
-        makeApiCall(options, search, values, callback);
+        makeApiCall(params.options, search, values, params.callback);
     },
     getEpisodeList: function(seriesId, options, callback) {
+        var params = fixParameters(options, callback);
         var values = eplist.queryObject(seriesId);
-        makeApiCall(options, eplist, values, callback);
+        makeApiCall(params.options, eplist, values, params.callback);
     },
     getSeriesDetails: function(seriesId, options, callback) {
         var values = eplist.queryObject(seriesId);
         makeApiCall(options, seriesinfo, values, callback);
     }
 };
+
+function fixParameters(options, callback) {
+    var onlyHaveCallback = (typeof(options) === "function" && callback === undefined);
+    
+    return {
+        options: onlyHaveCallback ? {} : options,
+        callback: onlyHaveCallback ? options : callback
+    };
+}
 
 var querystring = require("querystring"),
     defaultify = require("defaultify"),
