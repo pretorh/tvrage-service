@@ -10,8 +10,9 @@ module.exports = {
         makeApiCall(params.options, eplist, values, params.callback);
     },
     getSeriesDetails: function(seriesId, options, callback) {
+        var params = fixParameters(options, callback);
         var values = eplist.queryObject(seriesId);
-        makeApiCall(options, seriesinfo, values, callback);
+        makeApiCall(params.options, seriesinfo, values, params.callback);
     }
 };
 
