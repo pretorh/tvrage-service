@@ -1,5 +1,11 @@
 module.exports = {
-    parse: parse
+    parse: parse,
+    apiName: "episode_list",
+    queryObject: function(seriesId) {
+        return {
+            sid: seriesId
+        };
+    }
 };
 
 var xph = require("./xmlparsehelper");
