@@ -1,5 +1,11 @@
 module.exports = {
-    parse: parse
+    parse: parse,
+    apiName: "search",
+    queryObject: function(series) {
+        return {
+            show: series
+        };
+    }
 };
 
 var xph = require("./xmlparsehelper");
