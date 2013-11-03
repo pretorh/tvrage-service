@@ -14,6 +14,11 @@ function GetXmlMock(resultFile) {
         self.calls.push(url);
         fs.readFile("./test/data/" + resultFile, {encoding: "utf-8"}, callback);
     }
+    self.getOptions = function() {
+        return {
+            get: self.get
+        };
+    }
 }
 
 vows.describe("http test").addBatch({
@@ -21,7 +26,7 @@ vows.describe("http test").addBatch({
         topic: function(mock) {
             var cb = this.callback;
             var mock = new GetXmlMock("search.xml");
-            tvrage.search("series name", mock.get, function(err, result) {
+            tvrage.search("series name", mock.getOptions(), function(err, result) {
                 cb(err, {
                     mock: mock,
                     result: result
@@ -49,7 +54,7 @@ vows.describe("http test").addBatch({
         topic: function(mock) {
             var cb = this.callback;
             var mock = new GetXmlMock("episode_list.xml");
-            tvrage.getEpisodeList(22622, mock.get, function(err, result) {
+            tvrage.getEpisodeList(22622, mock.getOptions(), function(err, result) {
                 cb(err, {
                     mock: mock,
                     result: result
@@ -86,7 +91,7 @@ vows.describe("http test").addBatch({
         topic: function(mock) {
             var cb = this.callback;
             var mock = new GetXmlMock("episodeinfo.xml");
-            tvrage.getSeriesDetails(22622, mock.get, function(err, result) {
+            tvrage.getSeriesDetails(22622, mock.getOptions(), function(err, result) {
                 cb(err, {
                     mock: mock,
                     result: result
