@@ -1,7 +1,9 @@
 var vows = require("vows"),
-    fs = require("fs"),
     assert = require("assert"),
-    xml2js = require("xml2js"),
+    
+    values = require("./value-asserts"),
+    fs = require("fs"),
+    
     xph = require("../src/xmlparsehelper"),
     search = require("../src/search"),
     eplist = require("../src/eplist"),
@@ -64,25 +66,10 @@ vows.describe("parsing").addBatch({
             assert.equal(result.length, 2);
         },
         "the first element matches *Modern Family*": function(err, result) {
-            assert.equal(result[0].id, 22622);
-            assert.equal(result[0].name, "Modern Family");
-            assert.equal(result[0].link, "http://www.tvrage.com/Modern_Family");
-            assert.equal(result[0].started, 2009);
-            assert.equal(result[0].ended, null);
-            assert.equal(result[0].seasons, 5);
-            assert.equal(result[0].genres.length, 1);
-            assert.equal(result[0].genres[0], "Comedy");
+            values.isModernFamily(result[0]);
         },
         "the second element matches *some other show*": function(err, result) {
-            assert.equal(result[1].id, 1);
-            assert.equal(result[1].name, "some other show");
-            assert.equal(result[1].link, "http://www.tvrage.com/some_other_show");
-            assert.equal(result[1].started, 1995);
-            assert.equal(result[1].ended, 1996);
-            assert.equal(result[1].seasons, 1);
-            assert.equal(result[1].genres.length, 2);
-            assert.equal(result[1].genres[0], "genre1");
-            assert.equal(result[1].genres[1], "genre2");
+            values.isSomeOtherShow(result[1]);
         }
     },
     "with the episode list results parsed": {
@@ -113,13 +100,7 @@ vows.describe("parsing").addBatch({
                 topic: function(season) {
                     return season.list[0];
                 },
-                "is for *Pilot*": function(ep) {
-                    assert.equal(ep.index.overall, 1);
-                    assert.equal(ep.index.season, 1);
-                    assert.equal(ep.aired, "2009-09-23");
-                    assert.equal(ep.link, "http://www.tvrage.com/Modern_Family/episodes/1064810238");
-                    assert.equal(ep.title, "Pilot");
-                }
+                "is for *Pilot*": values.isPilot
             }
         },
         "given the *second* season": {
@@ -137,13 +118,7 @@ vows.describe("parsing").addBatch({
                 topic: function(season) {
                     return season.list[1];
                 },
-                "is for *The Kiss*": function(ep) {
-                    assert.equal(ep.index.overall, 26);
-                    assert.equal(ep.index.season, 2);
-                    assert.equal(ep.aired, "2010-09-29");
-                    assert.equal(ep.link, "http://www.tvrage.com/Modern_Family/episodes/1064975829");
-                    assert.equal(ep.title, "The Kiss");
-                }
+                "is for *The Kiss*": values.isTheKiss
             }
         }
     },
@@ -157,31 +132,16 @@ vows.describe("parsing").addBatch({
             assert.isNotNull(result);
         },
         "the result has some basic details": function(err, result) {
-            assert.equal(result.id, 22622);
-            assert.equal(result.name, "Modern Family");
-            assert.equal(result.status, "Returning Series");
-            assert.equal(result.runtime, 30);
+            values.hasModernFamilyDetails(result);
         },
         "the result has the airtime": function(err, result) {
-            assert.isNotNull(result.airtime);
-            assert.equal(result.airtime.day, 3);
-            assert.equal(result.airtime.dayName, "Wednesday");
-            assert.equal(result.airtime.time, 21 * 60);
-            assert.equal(result.airtime.timeString, "09:00 pm");
+            values.hasModernFamilyAirtime(result);
         },
         "the latest ep is *05x06*": function(err, result) {
-            assert.isNotNull(result.latest);
-            assert.equal(result.latest.season, 5);
-            assert.equal(result.latest.number, 6);
-            assert.equal(result.latest.title, "The Help");
-            assert.equal(result.latest.aired, "2013-10-23");
+            values.hasModernFamilyLatestEp(result);
         },
         "the next ep is *05x07*": function(err, result) {
-            assert.isNotNull(result.next);
-            assert.equal(result.next.season, 5);
-            assert.equal(result.next.number, 7);
-            assert.equal(result.next.title, "A Fair to Remember");
-            assert.equal(result.next.aired, "2013-11-13");
+            values.hasModernFamilyNextEp(result);
         }
     },
     "with an ended series' info results": {
