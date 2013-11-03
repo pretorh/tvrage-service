@@ -1,6 +1,7 @@
 module.exports = {
     isModernFamily: isModernFamily,
     isSomeOtherShow: isSomeOtherShow,
+    isShowWithoutGenres: isShowWithoutGenres,
     isPilot: isPilot,
     isTheKiss: isTheKiss,
     hasModernFamilyDetails: hasModernFamilyDetails,
@@ -32,6 +33,16 @@ function isSomeOtherShow(data) {
     assert.equal(data.genres.length, 2);
     assert.equal(data.genres[0], "genre1");
     assert.equal(data.genres[1], "genre2");
+}
+
+function isShowWithoutGenres(data) {
+    assert.equal(data.id, 1);
+    assert.equal(data.name, "name");
+    assert.equal(data.link, "link");
+    assert.equal(data.started, 1990);
+    assert.isNull(data.ended);
+    assert.equal(data.seasons, 1);
+    assert.equal(data.genres.length, 0);
 }
 
 function isPilot(ep) {

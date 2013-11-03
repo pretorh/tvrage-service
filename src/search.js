@@ -45,6 +45,8 @@ function mapShows(shows, callback) {
 }
 
 function mapGenres(show) {
+    if (show.genres[0] === "") return [];
+    
     var result = [];
     for (var i = 0; i < show.genres[0].genre.length; ++i) {
         result[i] = show.genres[0].genre[i];

@@ -52,6 +52,7 @@ vows.describe("parsing").addBatch({
             }
         }
     },
+    
     "with search results parsed": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/search.xml", {encoding: "utf-8"});
@@ -72,6 +73,7 @@ vows.describe("parsing").addBatch({
             values.isSomeOtherShow(result[1]);
         }
     },
+    
     "with the episode list results parsed": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/episode_list.xml", {encoding: "utf-8"});
@@ -122,6 +124,7 @@ vows.describe("parsing").addBatch({
             }
         }
     },
+    
     "with the series info results": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/episodeinfo.xml", {encoding: "utf-8"});
@@ -144,6 +147,7 @@ vows.describe("parsing").addBatch({
             values.hasModernFamilyNextEp(result);
         }
     },
+    
     "with an ended series' info results": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/episodeinfo2.xml", {encoding: "utf-8"});
@@ -155,6 +159,21 @@ vows.describe("parsing").addBatch({
         },
         "the next ep object is *undefined*": function(err, result) {
             assert.isUndefined(result.next);
+        }
+    },
+    
+    "when parsing a series with no genres": {
+        topic: function() {
+            var xml = fs.readFileSync("./test/data/no-genre.xml", {encoding: "utf-8"});
+            search.parse(xml, this.callback);
+        },
+        "no errors occured": function(err, result) {
+            assert.isNull(err);
+            assert.isNotNull(result);
+        },
+        "but the other values are populated": function(err, result) {
+            assert.equal(result.length, 1);
+            values.isShowWithoutGenres(result[0]);
         }
     }
 }).export(module);
