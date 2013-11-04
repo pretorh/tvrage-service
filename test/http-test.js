@@ -58,6 +58,19 @@ vows.describe("http test").addBatch({
         },
         "the first entry of the result is *Modern Family*": function(err, res) {
             values.isModernFamily(res.result[0]);
+        },        
+        "the cache get function is called *once*": function(err, result) {
+            assert.equal(result.mock.getCacheCalls.length, 1);
+        },        
+        "the cache get function is called with *search...* key": function(err, result) {
+            assert.equal(result.mock.getCacheCalls[0], "search:show=series%20name");
+        },
+        "the cache save function is called *once*": function(err, result) {
+            assert.equal(result.mock.saveCacheCalls.length, 1);
+        },
+        "the cache save function is called with *search...* key and the result as the value": function(err, result) {
+            assert.equal(result.mock.saveCacheCalls[0].k, "search:show=series%20name");
+            assert.equal(result.mock.saveCacheCalls[0].v, result.result);
         }
     },
     
@@ -126,32 +139,6 @@ vows.describe("http test").addBatch({
             values.hasModernFamilyAirtime(res.result);
             values.hasModernFamilyLatestEp(res.result);
             values.hasModernFamilyNextEp(res.result);
-        }
-    },
-
-    "when searching for a series": {
-        topic: function() {
-            var cb = this.callback;
-            var mock = new GetXmlMock("search.xml");
-            tvrage.search("series name", mock.getOptions(), function(err, result) {
-                if (err) {
-                    cb(err);
-                } else {
-                    cb(null, {
-                        result: result,
-                        mock: mock
-                    });
-                }
-            });
-        },
-        "the cache get function is called once with *search...* key": function(err, result) {
-            assert.equal(result.mock.getCacheCalls.length, 1);
-            assert.equal(result.mock.getCacheCalls[0], "search:show=series%20name");
-        },
-        "the cache save function is called once with *search...* key and the result as the cache": function(err, result) {
-            assert.equal(result.mock.saveCacheCalls.length, 1);
-            assert.equal(result.mock.saveCacheCalls[0].k, "search:show=series%20name");
-            assert.equal(result.mock.saveCacheCalls[0].v, result.result);
         }
     },
 
