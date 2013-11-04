@@ -6,7 +6,7 @@ var vows = require("vows"),
     
     tvrage = require("../");
 
-function GetXmlMock(resultFile) {
+function GetXmlMock(resultFile, cacheValue) {
     var self = this;
     self.calls = [];
     self.getCacheCalls = [];
@@ -25,7 +25,7 @@ function GetXmlMock(resultFile) {
     }
     self.getCache = function(key, callback) {
         self.getCacheCalls.push(key);
-        callback(null);
+        callback(cacheValue);
     }
     self.saveCache = function(key, value) {
         self.saveCacheCalls.push({k: key, v:value});
@@ -152,6 +152,35 @@ vows.describe("http test").addBatch({
             assert.equal(result.mock.saveCacheCalls.length, 1);
             assert.equal(result.mock.saveCacheCalls[0].k, "search:show=series%20name");
             assert.equal(result.mock.saveCacheCalls[0].v, result.result);
+        }
+    },
+
+    "when a value is returned from the cache": {
+        topic: function() {
+            var cb = this.callback;
+            var mock = new GetXmlMock("search.xml", "some cached value");
+            tvrage.search("series name", mock.getOptions(), function(err, result) {
+                if (err) {
+                    cb(err);
+                } else {
+                    cb(null, {
+                        result: result,
+                        mock: mock
+                    });
+                }
+            });
+        },
+        "the cache get function is called *once*": function(err, result) {
+            assert.equal(result.mock.getCacheCalls.length, 1);
+        },
+        "the cache save function is *not* called": function(err, result) {
+            assert.equal(result.mock.saveCacheCalls.length, 0);
+        },
+        "the get function is *not* called": function(err, result) {
+            assert.equal(result.mock.calls.length, 0);
+        },
+        "the cached value is returned": function(err, result) {
+            assert.equal(result.result, "some cached value");
         }
     }
 }).export(module);

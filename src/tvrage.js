@@ -45,7 +45,7 @@ function makeApiCall(userOptions, apiCall, values, callback) {
             var cacheKey = apiCall.apiName + ":" + qs;
             options.cache(cacheKey, function(cachedValue) {
                 if (cachedValue) {
-                    apiCall.parse(xml, callback);
+                    callback(null, cachedValue);
                 } else {
                     // cache miss
                     if (options.get === serviceClientWrapper) {
