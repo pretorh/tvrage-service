@@ -9,15 +9,26 @@ var vows = require("vows"),
 function GetXmlMock(resultFile) {
     var self = this;
     self.calls = [];
-    
+    self.getCacheCalls = [];
+    self.saveCacheCalls = [];
+
     self.get = function(url, callback) {
         self.calls.push(url);
         fs.readFile("./test/data/" + resultFile, {encoding: "utf-8"}, callback);
     }
     self.getOptions = function() {
         return {
-            get: self.get
+            get: self.get,
+            cache: self.getCache,
+            save: self.saveCache
         };
+    }
+    self.getCache = function(key, callback) {
+        self.getCacheCalls.push(key);
+        callback(null);
+    }
+    self.saveCache = function(key, value) {
+        self.saveCacheCalls.push({k: key, v:value});
     }
 }
 
@@ -115,6 +126,32 @@ vows.describe("http test").addBatch({
             values.hasModernFamilyAirtime(res.result);
             values.hasModernFamilyLatestEp(res.result);
             values.hasModernFamilyNextEp(res.result);
+        }
+    },
+
+    "when searching for a series": {
+        topic: function() {
+            var cb = this.callback;
+            var mock = new GetXmlMock("search.xml");
+            tvrage.search("series name", mock.getOptions(), function(err, result) {
+                if (err) {
+                    cb(err);
+                } else {
+                    cb(null, {
+                        result: result,
+                        mock: mock
+                    });
+                }
+            });
+        },
+        "the cache get function is called once with *search...* key": function(err, result) {
+            assert.equal(result.mock.getCacheCalls.length, 1);
+            assert.equal(result.mock.getCacheCalls[0], "search:show=series%20name");
+        },
+        "the cache save function is called once with *search...* key and the result as the cache": function(err, result) {
+            assert.equal(result.mock.saveCacheCalls.length, 1);
+            assert.equal(result.mock.saveCacheCalls[0].k, "search:show=series%20name");
+            assert.equal(result.mock.saveCacheCalls[0].v, result.result);
         }
     }
 }).export(module);
