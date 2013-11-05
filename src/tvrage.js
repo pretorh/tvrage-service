@@ -79,10 +79,8 @@ function makeApiCall(userOptions, apiCall, values, callback) {
 function buildOptions(user, callback) {
     const DEFAULT = {
         get: serviceClientWrapper,
-        cache: function(key, callback) {
-            callback(null);
-        },
-        save: function(key, value) {}
+        cache: redisWrapper.cache,
+        save: redisWrapper.save
     };
     
     try {
@@ -105,3 +103,38 @@ function serviceClientWrapper(apiCall, url, callback) {
         callback(e);
     }
 }
+
+function RedisWrapper() {
+    var self = this;
+    var redis = null;
+
+    self.cache = function(key, callback) {
+        if (redis) {
+            redis.get(key, function(err, value) {
+                callback(value);
+            });
+        } else {
+            // always cache miss
+            callback(null);
+        }
+    }
+    self.save = function(key, value) {
+        if (redis) {
+            redis.set(key, JSON.stringify(value));
+        } // else: no-op
+    }
+
+    function createRedis() {
+        try {
+            var r = require("redis").createClient();
+            r.on("ready", function() {
+                redis = r;
+            });
+        } catch (e) { /* ignored */ }
+    }
+
+    process.nextTick(createRedis);
+}
+
+var redisWrapper = new RedisWrapper();
+

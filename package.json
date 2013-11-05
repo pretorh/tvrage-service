@@ -30,6 +30,7 @@
     "defaultify": "0.0.3"
   },
   "optionalDependencies": {
-    "service-client": "0.0.1"
+    "service-client": "0.0.1",
+    "redis": "~0.9.0"
   }
 }
