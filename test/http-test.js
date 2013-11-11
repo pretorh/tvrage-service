@@ -1,9 +1,9 @@
 var vows = require("vows"),
     assert = require("assert"),
     values = require("./value-asserts"),
-    
+
     fs = require("fs"),
-    
+
     tvrage = require("../");
 
 function GetXmlMock(resultFile, cacheValue) {
@@ -29,6 +29,16 @@ function GetXmlMock(resultFile, cacheValue) {
     }
     self.saveCache = function(key, value) {
         self.saveCacheCalls.push({k: key, v:value});
+    }
+}
+
+function getMultiMock(url, callback) {
+    if (url === "http://services.tvrage.com/feeds/search.php?show=modern%20family") {
+        fs.readFile("./test/data/search.xml", callback);
+    } else if (url === "http://services.tvrage.com/feeds/episode_list.php?sid=22622") {
+        fs.readFile("./test/data/episode_list.xml", callback);
+    } else {
+        callback(new Error("not implemented for url: " + url));
     }
 }
 
@@ -58,10 +68,10 @@ vows.describe("http test").addBatch({
         },
         "the first entry of the result is *Modern Family*": function(err, res) {
             values.isModernFamily(res.result[0]);
-        },        
+        },
         "the cache get function is called *once*": function(err, result) {
             assert.equal(result.mock.getCacheCalls.length, 1);
-        },        
+        },
         "the cache get function is called with *search...* key": function(err, result) {
             assert.equal(result.mock.getCacheCalls[0], "search:show=series%20name");
         },
@@ -73,7 +83,7 @@ vows.describe("http test").addBatch({
             assert.equal(result.mock.saveCacheCalls[0].v, result.result);
         }
     },
-    
+
     "when listing a series' episodes": {
         topic: function(mock) {
             var cb = this.callback;
@@ -110,7 +120,7 @@ vows.describe("http test").addBatch({
             values.isTheKiss(res.result[1].list[1]);
         }
     },
-    
+
     "when getting a series' details": {
         topic: function(mock) {
             var cb = this.callback;
@@ -168,6 +178,50 @@ vows.describe("http test").addBatch({
         },
         "the cached value is returned": function(err, result) {
             assert.equal(result.result, "some cached value");
+        }
+    },
+
+    "when getting an episodes details": {
+        topic: function() {
+            var query = {
+                series: "modern family",
+                season: 2,
+                episodes: ["01", "02"]
+            };
+            tvrage.getEpisode(query, {
+                get: getMultiMock,
+                cache: function(k, cb) {cb(null);}
+            }, this.callback);
+        },
+        "no errors occured": function(err, data) {
+            assert.isNull(err);
+        },
+        "the result has a *matched* field": function(err, data) {
+            assert.isDefined(data.matched);
+        },
+        "the result has a *series* array with all the serie's name matches": function(err, data) {
+            assert.isArray(data.series);
+            assert.equal(2, data.series.length);
+            assert.equal("Modern Family", data.series[0].name);
+            assert.equal(22622, data.series[0].id);
+            assert.equal("some other show", data.series[1].name);
+            assert.equal(1, data.series[1].id);
+        },
+        "the episode details are returned in the *matched* field": {
+            topic: function(data) { return data.matched; },
+            "series name": function(details) {
+                assert.equal("Modern Family", details.series);
+            },
+            "season": function(details) {
+                assert.equal(2, details.season);
+            },
+            "episodes": function(details) {
+                assert.equal(2, details.episodes.length);
+                assert.equal("The Old Wagon", details.episodes[0].title);
+                assert.equal(1, details.episodes[0].index.season);
+                assert.equal("The Kiss", details.episodes[1].title);
+                assert.equal(2, details.episodes[1].index.season);
+            }
         }
     }
 }).export(module);
