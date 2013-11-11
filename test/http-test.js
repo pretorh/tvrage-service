@@ -188,10 +188,7 @@ vows.describe("http test").addBatch({
                 season: 2,
                 episodes: ["01", "02"]
             };
-            tvrage.getEpisode(query, {
-                get: getMultiMock,
-                cache: function(k, cb) {cb(null);}
-            }, this.callback);
+            tvrage.getEpisode(query, { get: getMultiMock }, this.callback);
         },
         "no errors occured": function(err, data) {
             assert.isNull(err);

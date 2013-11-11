@@ -164,7 +164,7 @@ function RedisWrapper() {
     self.cache = function(key, callback) {
         if (redis) {
             redis.get(key, function(err, value) {
-                callback(value);
+                callback(JSON.parse(value));
             });
         } else {
             // always cache miss
