@@ -16,7 +16,7 @@ module.exports = {
     },
     getEpisode: function(query, options, callback) {
         var params = fixParameters(options, callback);
-        getEpisodeDetails(query, options, callback);
+        getEpisodeDetails(query, params.options, params.callback);
     }
 };
 
