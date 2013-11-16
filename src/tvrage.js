@@ -91,18 +91,32 @@ function makeApiCall(userOptions, apiCall, values, callback) {
     var qs = querystring.stringify(values);
     var url = API_ROOT_URL + apiCall.apiName + ".php?" + qs;
 
+    function createSaveCacheAndCallback(cacheKey, options) {
+        return function(err, data) {
+            process.nextTick(function() {
+                if (err) {
+                    callback(err);
+                } else {
+                    options.save(cacheKey, data);
+                    callback(null, data);
+                }
+            });
+        };
+    }
+
     buildOptions(userOptions, function(err, options) {
         if (err) {
             callback(err);
         } else {
             var cacheKey = apiCall.apiName + ":" + qs;
+            var newCallback = createSaveCacheAndCallback(cacheKey, options);
             options.cache(cacheKey, function(cachedValue) {
                 if (cachedValue) {
                     callback(null, cachedValue);
                 } else {
                     // cache miss
                     if (options.get === serviceClientWrapper) {
-                        serviceClientWrapper(apiCall, url, callback);
+                        serviceClientWrapper(apiCall, url, newCallback);
                     } else {
                         options.get(url, function(err, xml) {
                             if (err) {
@@ -111,14 +125,7 @@ function makeApiCall(userOptions, apiCall, values, callback) {
                                 });
                             } else {
                                 process.nextTick(function() {
-                                    apiCall.parse(xml, function(err, data) {
-                                        if (err) {
-                                            callback(err);
-                                        } else {
-                                            options.save(cacheKey, data);
-                                            callback(null, data);
-                                        }
-                                    });
+                                    apiCall.parse(xml, newCallback);
                                 });
                             }
                         });
