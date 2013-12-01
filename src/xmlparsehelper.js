@@ -11,7 +11,8 @@ function parseToNode(xml, xpath, callback) {
             });
         } else {
             process.nextTick(function() {
-                findXpath(obj, xpath.split("."), callback);
+                var res = findXpath(obj, xpath.split("."));
+                callback(res.err, res.obj);
             });
         }
     });
@@ -21,19 +22,19 @@ function findXpath(obj, path, callback) {
     var item = path.shift();
     if (item) {
         if (obj[item]) {
-            findXpath(obj[item], path, callback);
+            return findXpath(obj[item], path, callback);
         } else {
-            process.nextTick(function() {
-                callback({
+            return {
+                err: {
                     error: "root not found",
                     detailed: "expected '" + item + "' in " + JSON.stringify(obj)
-                });
-            });
+                }};
         }
     } else {
-        process.nextTick(function() {
-            callback(null, obj);
-        });
+        return {
+            err: null,
+            obj: obj
+        };
     }
 }
 
