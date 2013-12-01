@@ -24,7 +24,8 @@ function parseToNode(xml, xpath, errPath, callback) {
                     // error object found
                     errobj.err = {
                         message: errPath.message,
-                        data: errobj.obj
+                        data: errobj.obj,
+                        httpErr: errPath.httpErr
                     };
                     callback(errobj.err);
                 } else {

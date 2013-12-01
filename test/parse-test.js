@@ -83,8 +83,11 @@ vows.describe("parsing").addBatch({
             assert.isNotNull(err);
             assert.isUndefined(result);
         },
-        "the error is 'not found'": function(err, result) {
-            assert.equal("not found", err.message);
+        "the error is *series not found*": function(err, result) {
+            assert.equal("series not found", err.message);
+        },
+        "http error *404* is returned": function(err, result) {
+            assert.equal(404, err.httpErr);
         }
     },
 

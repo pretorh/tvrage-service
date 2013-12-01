@@ -14,7 +14,8 @@ function parse(rawXmlString, callback) {
     process.nextTick(function() {
         xph.parseToNode(rawXmlString, "Results.show", {
                 path: "Results.0",
-                message: "not found"
+                message: "series not found",
+                httpErr: 404
             }, function(err, node) {
                 if (err) {
                     process.nextTick(function() {
