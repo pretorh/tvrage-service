@@ -55,9 +55,17 @@ function Server(port) {
     function createCallback(res) {
         return function(err, data) {
             if (err) {
-                writeResponse(res, 500, "internal error");
                 console.log(err);
-                if (err && err.buffer) {
+                
+                if (err.error && err.error.message) {
+                    var code = err.error.httpErr;
+                    if (!code) code = 500;
+                    writeResponse(res, code, err.error.message);
+                } else {
+                    writeResponse(res, 500, "internal error");
+                }
+
+                if (err.buffer) {
                     console.log(err.buffer.toString());
                 }
             } else {
