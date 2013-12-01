@@ -1,9 +1,9 @@
 var vows = require("vows"),
     assert = require("assert"),
-    
+
     values = require("./value-asserts"),
     fs = require("fs"),
-    
+
     xph = require("../src/xmlparsehelper"),
     search = require("../src/search"),
     eplist = require("../src/eplist"),
@@ -52,7 +52,7 @@ vows.describe("parsing").addBatch({
             }
         }
     },
-    
+
     "with search results parsed": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/search.xml", {encoding: "utf-8"});
@@ -73,7 +73,21 @@ vows.describe("parsing").addBatch({
             values.isSomeOtherShow(result[1]);
         }
     },
-    
+
+    "with search results that returns nothing": {
+        topic: function() {
+            var xml = fs.readFileSync("./test/data/empty-search.xml", {encoding: "utf-8"});
+            search.parse(xml, this.callback);
+        },
+        "an error occurs": function(err, result) {
+            assert.isNotNull(err);
+            assert.isUndefined(result);
+        },
+        "the error is 'not found'": function(err, result) {
+            assert.equal("not found", err.message);
+        }
+    },
+
     "with the episode list results parsed": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/episode_list.xml", {encoding: "utf-8"});
@@ -124,7 +138,7 @@ vows.describe("parsing").addBatch({
             }
         }
     },
-    
+
     "with the series info results": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/episodeinfo.xml", {encoding: "utf-8"});
@@ -147,7 +161,7 @@ vows.describe("parsing").addBatch({
             values.hasModernFamilyNextEp(result);
         }
     },
-    
+
     "with an ended series' info results": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/episodeinfo2.xml", {encoding: "utf-8"});
@@ -161,7 +175,7 @@ vows.describe("parsing").addBatch({
             assert.isUndefined(result.next);
         }
     },
-    
+
     "when parsing a series with no genres": {
         topic: function() {
             var xml = fs.readFileSync("./test/data/no-genre.xml", {encoding: "utf-8"});

@@ -3,7 +3,15 @@ module.exports.mapSimpleFields = map;
 
 var xml2js = require("xml2js");
 
-function parseToNode(xml, xpath, callback) {
+function parseToNode(xml, xpath, errPath, callback) {
+    if (arguments.length == 3 && typeof(errPath) == "function") {
+        callback = errPath;
+        errPath = {
+            path: "xxxxxxxx",
+            message: ""
+        };
+    }
+
     xml2js.parseString(xml, function(err, obj) {
         if (err) {
             process.nextTick(function() {
@@ -11,8 +19,18 @@ function parseToNode(xml, xpath, callback) {
             });
         } else {
             process.nextTick(function() {
-                var res = findXpath(obj, xpath.split("."));
-                callback(res.err, res.obj);
+                var errobj = findXpath(obj, errPath.path.split("."));
+                if (!errobj.err && errobj.obj) {
+                    // error object found
+                    errobj.err = {
+                        message: errPath.message,
+                        data: errobj.obj
+                    };
+                    callback(errobj.err);
+                } else {
+                    var res = findXpath(obj, xpath.split("."));
+                    callback(res.err, res.obj);
+                }
             });
         }
     });
